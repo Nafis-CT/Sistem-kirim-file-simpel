@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+    
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .btn-delete { color: white; background: #dc3545; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 14px;}
+        .btn-download { color: white; background: #28a745; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 14px;}
+        .top-menu { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px dashed #ccc; }
+        .btn-menu { padding: 8px 15px; text-decoration: none; border-radius: 3px; color: white; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Data File Masuk</h2>
+    
+    <div class="top-menu">
+        <a href="/open_folder" class="btn-menu" style="background: #007bff;">Buka Folder File Explorer</a>
+        <a href="/delete_all" class="btn-menu" style="background: #dc3545;" onclick="return confirm('Apakah Anda yakin ingin menghapus SEMUA file dan data?')">Hapus Semua Data</a>
+        <a href="#" class="btn-menu" style="background: #17a2b8;" onclick="window.location.reload(); return false;">Refresh Data</a>
+        <a href="" class="btn-menu" style="background:  #007bff;">Statistic</a>
+    </div>
+
+    <table id="tabelAdmin">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>No. WA</th>
+                <th>File</th>
+                <th>Tanggal</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2] }}</td>
+                <td>{{ row[3] }}</td>
+                <td>{{ row[4] }}</td>
+                <td>
+                    <a href="/download/{{ row[3] }}" target="_blank" class="btn-download">Buka / Unduh</a>
+                    <a href="/delete/{{ row[0] }}/{{ row[3] }}" class="btn-delete" onclick="return confirm('Hapus file ini?')">Hapus</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
+    
+    <div style="text-align: center; margin-top: 40px; margin-bottom: 30px;">
+        <img src="{{ url_for('static', filename='hiasan.webp') }}" alt="Gambar Hiasan" style="max-width: 300px; height: auto; border-radius: 15px; opacity: 0.7;">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
+    <script>
+        // Mengaktifkan fitur Smart Table pada tabel dengan ID "tabelAdmin"
+        const dataTable = new simpleDatatables.DataTable("#tabelAdmin", {
+            searchable: true,
+            fixedHeight: true,
+            labels: {
+                placeholder: "Cari data",
+                perPage: "Data per halaman",
+                noRows: "Tidak ada data ditemukan",
+                info: "Menampilkan {start} - {end} dari {rows} data"
+            }
+        });
+        
+    </script>
+
+    <script>
+        let timeToRefresh = 50000; // 10 detik
+        let refreshTimer = setTimeout(reloadPage, timeToRefresh);
+
+        function reloadPage() {
+            window.location.reload();
+        }
+
+        // Membatalkan auto-refresh jika Admin sedang mengetik di kotak pencarian Smart Table
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('dataTable-input')) {
+                clearTimeout(refreshTimer);
+                // Jika kotak pencarian kembali kosong, mulai lagi timernya
+                if (e.target.value === '') {
+                    refreshTimer = setTimeout(reloadPage, timeToRefresh);
+                }
+            }
+        });
+    </script>
+
+
+    
+</body>
+</html>
